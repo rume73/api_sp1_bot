@@ -26,14 +26,6 @@ logging.basicConfig(
     format='%(asctime)s, %(levelname)s, %(message)s, %(name)s'
 )
 
-logging.basicConfig(
-    level=logging.ERROR,
-    filename='bot.log',
-    filemode='w',
-    datefmt='%Y-%m-%d,%H:%M:%S',
-    format='%(asctime)s, %(levelname)s, %(message)s, %(name)s'
-)
-
 
 def parse_homework_status(homework):
     homework_name = homework.get('homework_name')
@@ -57,14 +49,13 @@ def get_homework_statuses(current_timestamp):
         homework_statuses = requests.get(URL, headers=headers,
                                          params={
                                              'from_date': current_timestamp})
-        if 'error' in homework_statuses.json():
-            raise Exception(
-                f'Ошибка распаковки json() '
-                f'{homework_statuses.json().get("error")}')
-        return homework_statuses.json()
-    except requests.RequestException as e:
-        logging.error(f'Ошибка у бота {e}')
-    except Exception as e:
+        try:
+            if 'error' in homework_statuses.json():
+                raise ValueError('Ошибка распаковки json()')
+            return homework_statuses.json()
+        except requests.RequestException as e:
+            logging.error(f'Ошибка у бота {e}')
+    except ValueError as e:
         logging.error(f'Ошибка распаковки json() {e}')
 
 
