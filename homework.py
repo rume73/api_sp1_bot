@@ -1,5 +1,6 @@
 import os
 import time
+import json
 
 import logging
 import requests
@@ -45,17 +46,15 @@ def parse_homework_status(homework):
 
 
 def get_homework_statuses(current_timestamp):
+    homework_statuses = requests.get(URL, headers=headers,
+                                     params={'from_date': current_timestamp})
     try:
-        homework_statuses = requests.get(URL, headers=headers,
-                                         params={
-                                             'from_date': current_timestamp})
-        try:
-            if 'error' in homework_statuses.json():
-                raise ValueError('Ошибка распаковки json()')
-            return homework_statuses.json()
-        except requests.RequestException as e:
-            logging.error(f'Ошибка у бота {e}')
-    except ValueError as e:
+        return homework_statuses.json()
+    except requests.RequestException as e:
+        logging.error(f'Ошибка у бота {e}')
+    try:
+        return homework_statuses.json()
+    except json.JSONDecodeError as e:
         logging.error(f'Ошибка распаковки json() {e}')
 
 
