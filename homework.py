@@ -57,6 +57,7 @@ def get_homework_statuses(current_timestamp):
         return homework_statuses.json()
     except json.JSONDecodeError as e:
         logging.error(f'Ошибка распаковки json() {e}')
+        return {}
 
 
 def send_message(message, bot_client):
